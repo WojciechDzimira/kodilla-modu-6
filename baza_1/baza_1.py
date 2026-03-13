@@ -196,3 +196,4 @@ if __name__ == '__main__':
 
     # Zamknięcie połączenia
     base.close()
+    logging.debug("Zamknięto połączenie z bazą danych")
