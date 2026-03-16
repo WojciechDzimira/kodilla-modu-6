@@ -142,7 +142,35 @@ def data_base_creation(base):
     import_from_csv(base, "Measurements", "clean_measure.csv")
 
 
+def top_temp_in_stations(base):
+    sql = """
+            SELECT S.name, M.date, M.tobs 
+            FROM Measurements M
+            JOIN Stations S ON M.station = S.station 
+            WHERE S.station = ? 
+            ORDER BY M.tobs DESC 
+            LIMIT 3
+            """
 
+    print("\n" + "="*70)
+    print("Maksymalne temperatury w stacjach (TOP 3)")
+    print()
+    stations = base.select("station", "Stations")
+    for (station_id,) in stations:
+        results = base.execute_sql(sql, (station_id,))
+        print("\n" + "="*70)
+            
+        if results:
+            print(f"\nSTACJA: {results[0][0]} (ID: {station_id})")
+            for _, date, temp in results:
+                print(f"  > Dnia {date} odnotowano {temp}°C")
+
+    print("\n" + "="*70)
+
+def choice(text):
+    if input(f"{text}") == "t":
+        return True
+    return False
 
 
 if __name__ == '__main__':
@@ -152,39 +180,20 @@ if __name__ == '__main__':
             print("Nie udało się połączyć z bazą. Koniec programu.")
             exit(1)
 
-        choice = input("Pierwsze uruchomienie? Wpisz: (t) by utworzyć baze danych i zaimportować dane z plików csv ").lower()
-        if choice == "t":
+
+
+
+
+        if choice("Pierwsze uruchomienie? Wpisz: (t) by utworzyć baze danych i zaimportować dane z plików csv "):
             data_base_creation(base)
-        
-        sql = """
-            SELECT S.name, M.date, M.tobs 
-            FROM Measurements M
-            JOIN Stations S ON M.station = S.station 
-            WHERE S.station = ? 
-            ORDER BY M.tobs DESC 
-            LIMIT 3
-            """
 
-        print("\n" + "="*70)
-        print("Maksymalne temperatury w stacjach (TOP 3)")
-        print()
-        stations = base.select("station", "Stations")
-        for (station_id,) in stations:
-            results = base.execute_sql(sql, (station_id,))
-            print("\n" + "="*70)
-            
-            if results:
-                print(f"\nSTACJA: {results[0][0]} (ID: {station_id})")
-                for _, date, temp in results:
-                    print(f"  > Dnia {date} odnotowano {temp}°C")
-
-        print("\n" + "="*70)
+        if choice("chcesz Wyświetlić top 3 temperatury ze wszystkich stacji? Wpisz (t) "):
+            top_temp_in_stations(base)
 
 
         # Zamknięcie połączenia
         base.close()
         logging.debug("Zamknięto połączenie z bazą danych")
 
-        choice = input("Ponownie? (T/n): ").lower()
-        if choice != "t":
+        if not choice("Ponownie? (T/n): "):
             break
