@@ -1,0 +1,20 @@
+# Bazy danych 
+*.db
+*.sqlite3
+
+# Foldery Pythona 
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Środowiska wirtualne
+venv/
+env/
+.venv/
+
+# Konfiguracja edytorów 
+.vscode/
+.idea/
+
+# Logi
+*.log
