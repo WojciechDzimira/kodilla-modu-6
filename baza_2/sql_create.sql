@@ -1,17 +1,19 @@
-CREATE TABLE IF NOT EXISTS Projekt (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        nazwa TEXT NOT NULL,
-        start_date TEXT,
-        end_date TEXT
+CREATE TABLE IF NOT EXISTS Stations (
+        station TEXT PRIMARY KEY,  
+        latitude FLOAT NOT NULL,
+        longitude FLOAT NOT NULL,
+        elevation FLOAT NOT NULL,
+        name TEXT NOT NULL,
+        country TEXT NOT NULL,
+        state text not null
+
     );
 
-    CREATE TABLE IF NOT EXISTS Zadanie (
+    CREATE TABLE IF NOT EXISTS Measurements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        projekt_id INTEGER,
-        nazwa TEXT NOT NULL,
-        opis TEXT,
-        status TEXT,
-        start_date TEXT,
-        end_date TEXT,
-        FOREIGN KEY (projekt_id) REFERENCES Projekt (id)
+        station TEXT NOT NULL,
+        date TEXT NOT NULL,
+        precip FLOAT,
+        tobs FLOAT,
+        FOREIGN KEY (station) REFERENCES Stations (station)
     );
