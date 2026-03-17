@@ -1,4 +1,6 @@
 import logging
+import sqlite3
+from sqlite3 import Error
 from faker import Faker
 fake = Faker('pl_PL')
 logging.basicConfig(level=logging.DEBUG)
@@ -7,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class DataBaseSQL:
     """Klasa zarzadzająca bazą danych sql"""
-
+    ALLOWED_TABLES = {"Media", "Movies", "Episodes"}
     def __init__(self, db_file):
         self.conn = self.create_connection(db_file)
 
@@ -21,6 +23,14 @@ class DataBaseSQL:
         except Error as e:
             logging.error(f"Błąd połączenia z bazą: {e}")
         return conn
+
+    def get_table_columns(self, table_name):
+        if table_name not in self.ALLOWED_TABLES:
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
+        cur = self.conn.cursor()
+        cur.execute(f"PRAGMA table_info({table_name})")
+        return {row[1] for row in cur.fetchall()}
 
     def execute_script(self, sql_script_file):
         """Metoda pozwala wykonać skrypt zapisany w pliku"""
@@ -56,10 +66,14 @@ class DataBaseSQL:
             except Error as e:
                 logging.error(f"Błąd wykonania SQL: {e}")
                 return False # zwraca false jesli blad danych
-            return True
+            return cur.lastrowid
 
     def select_all(self, table_name):
         """Metoda zwraca wszystkie rekordy z podanej tabeli."""
+        if table_name not in self.ALLOWED_TABLES:
+            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
+
         if self.conn:
             try:
                 cur = self.conn.cursor()
@@ -71,6 +85,9 @@ class DataBaseSQL:
     
     def select(self, select_item, table_name):
         """Metoda zwraca coś z podanej tabeli"""
+        if table_name not in self.ALLOWED_TABLES:
+            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
         if self.conn:
             try:
                 cur = self.conn.cursor()
@@ -82,6 +99,15 @@ class DataBaseSQL:
     
     def update(self, table_name, column_name, new_value, row_id):
         """Metoda zmienia wartość w określonym miejscu bazy danych"""
+        if table_name not in self.ALLOWED_TABLES:
+            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
+        
+        valid_columns = self._get_table_columns(table_name)
+        if column_name not in valid_columns:
+            logging.error(f"Nieprawidłowa kolumna: {column_name}")
+            return []
+        
         if self.conn:
             try:
                 cur = self.conn.cursor()
@@ -94,6 +120,9 @@ class DataBaseSQL:
 
     def delete(self, table_name, row_id):
         """metoda usuwa określony element bazy danych"""
+        if table_name not in self.ALLOWED_TABLES:
+            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
         if self.conn:
             try:
                 cur = self.conn.cursor()

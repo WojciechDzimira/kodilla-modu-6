@@ -1,115 +1,14 @@
 import sqlite3
 from sqlite3 import Error
 import logging
+from faker import Faker
+fake = Faker('pl_PL')
 from utils.utils import int_input, choose_content_type, choice
 from src.SQL_engine import DataBaseSQL
 
 logging.basicConfig(level=logging.DEBUG)
 
-class DataBaseSQL:
-    """Klasa zarzadzająca bazą danych sql"""
 
-    def __init__(self, db_file):
-        self.conn = self.create_connection(db_file)
-
-    def create_connection(self, db_file):
-        """Tworzy połączenie z bazą danych"""
-        conn = None
-        try:
-            conn = sqlite3.connect(db_file)
-            logging.debug(f"Połączono z {db_file}")
-            return conn
-        except Error as e:
-            logging.error(f"Błąd połączenia z bazą: {e}")
-        return conn
-
-    def execute_script(self, sql_script_file):
-        """Metoda pozwala wykonać skrypt zapisany w pliku"""
-        with open(sql_script_file, "r", encoding="utf-8") as f:
-            sql_script = f.read()
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                cur.executescript(sql_script)
-                self.conn.commit()
-                logging.debug("Wykonano skrypt SQL.")
-            except Error as e:
-                logging.error(f"Błąd wykonania skryptu: {e}")
-
-    def execute_sql(self, sql, params=()):
-        """Metoda wykonuje polecenie sql z paramterami."""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                cur.execute(sql, params)          
-                self.conn.commit()
-                logging.debug("Wykonano polecenie SQL.")
-                return cur.fetchall()
-            except Error as e:
-                logging.error(f"Błąd wykonania SQL: {e}")
-    
-    def execute_sql_without_commit(self, sql, params=()):
-        """Metoda wykonuje polecenie sql z paramterami."""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                cur.execute(sql, params)          
-            except Error as e:
-                logging.error(f"Błąd wykonania SQL: {e}")
-                return False # zwraca false jesli blad danych
-            return True
-
-    def select_all(self, table_name):
-        """Metoda zwraca wszystkie rekordy z podanej tabeli."""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                cur.execute(f"SELECT * FROM {table_name}")
-                return cur.fetchall()
-            except Error as e:
-                logging.error(f"Błąd SELECT: {e}")
-        return []                         
-    
-    def select(self, select_item, table_name):
-        """Metoda zwraca coś z podanej tabeli"""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                cur.execute(f"SELECT {select_item} FROM {table_name}")
-                return cur.fetchall()
-            except Error as e:
-                logging.error(f"Błąd SELECT: {e}")
-        return []                         
-    
-    def update(self, table_name, column_name, new_value, row_id):
-        """Metoda zmienia wartość w określonym miejscu bazy danych"""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                sql = f"UPDATE {table_name} SET {column_name} = ? WHERE id = ?"
-                cur.execute(sql, (new_value, row_id)) 
-                logging.debug(f"Zaktualizowano: tabele {table_name} w wierszu {row_id}")
-                self.conn.commit()
-            except Error as e:
-                logging.error(f"Błąd Update: {e}")
-
-    def delete(self, table_name, row_id):
-        """metoda usuwa określony element bazy danych"""
-        if self.conn:
-            try:
-                cur = self.conn.cursor()
-                sql = f"DELETE FROM {table_name} WHERE id = ?"
-                cur.execute(sql, (row_id,)) 
-                logging.debug(f"usunięto: wiersz {row_id,} w tabeli {table_name}")
-                self.conn.commit()
-                
-            except Error as e:
-                logging.error(f"Błąd Usunięcia: {e}")
-
-    def close(self):
-        """metoda zamyka połaczenie z bazą danych"""
-        if self.conn:
-            self.conn.close()
    
 
 def data_base_creation(base):
@@ -117,26 +16,84 @@ def data_base_creation(base):
     base.execute_script("sql_create.sql")
 
 
+def populate(base):
+  
+    while  True:
+        genre_list = ["dramaty", "komedia", "tragedia", "fantasy", "horror", "przygodowy", "Sci-fi", "akcja"]
+        x = int_input("Wczytać istniejącą listę: wpisz 1, utworzyc nową losową listę: wpisz 2 ")
+        if x == 1:
+            print("jeszcze mnie tu nie ma, ale bede ")
+
+        if x == 2:
+            print("UZUPEŁNIANIE BIBLIOTEKI LOSOWYMI FILMAMI/SERIALAMI")
+            number_of_films = int_input("Podaj ile losowych filmów chcesz mieć w bibliotece? Wpisz liczbę całkowitą lub 0: ")
+            number_of_serials = int_input("Podaj ile losowych seriali ma znaleźć się w bibliotece: kazdy bedzie miał 3 sezony po 15 odcinków. Wpisz liczbę całkowitą lub 0: ")
+            
+            
+
+
+
+
+
+def media_maker(base, media, media_number):
+    genre_list = [
+    "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", 
+    "Horror", "Music", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
+
+    sql = "INSERT INTO Media (title, release_year, director, genre, content_type) VALUES (?, ?, ?, ?, ?)"
+    for x in range(media_number):
+                
+        title = fake.catch_phrase()
+        release_year = fake.year()
+        director = fake.name()
+        genre = fake.random_element(genre_list)
+        content_type = media
+        row = (title, release_year, director, genre, content_type)
+        row_id  = base.execute_sql_without_commit(sql, row)
+
+        if media == "Movie":
+            sql_movie = "INSERT INTO Movies (id) VALUES (?)"
+            base.execute_sql_without_commit(sql_movie, (row_id,))
+
+        elif media == "Serial":
+            sql_serial = "INSERT INTO Episodes (media_id, season_number, episode_number) VALUES (?, ?, ?)"
+            for season in range(1, 4):
+                for episode in range(1, 16):
+                    base.execute_sql_without_commit(sql_serial, (row_id, season, episode))
+    base.conn.commit()
+   
+
+
+
+
+
 
 
 
 if __name__ == '__main__':
     while True:
-        base = DataBaseSQL("database.db")
+        
+        if choice("Pierwsze uruchomienie? Jeśli chcesz utworzyć losową bazę danych wciśnij: (T) "):
+            
+            base = DataBaseSQL("database.db")
+            base.execute_script("sql_create.sql")
+            logging.debug("Utworzono baze danych")
+
+        if choice("chcesz utworzyć filmy? Wciśnij (T):"):
+            media = "Movie"
+            media_number = int_input("Podaj ile losowych filmów chcesz mieć w bibliotece? Wpisz liczbę całkowitą lub 0:")
+            media_maker(base, media, media_number)
+
+        if choice("chcesz utworzyć seriale? Wciśnij (T):"):
+            media_number = int_input("Podaj ile losowych seriali ma znaleźć się w bibliotece: kazdy bedzie miał 3 sezony po 15 odcinków. Wpisz liczbę całkowitą lub 0: ")
+            media = "Serial"
+            media_maker(base, media, media_number)
+
+
+
         if base.conn is None:
             print("Nie udało się połączyć z bazą. Koniec programu.")
             exit(1)
-
-        if choice("Pierwsze uruchomienie? Wpisz: (t) by utworzyć baze danych i zaimportować dane z plików csv "):
-            data_base_creation(base)
-
-       
-
-
-
-
-
-
         # Zamknięcie połączenia
         base.close()
         logging.debug("Zamknięto połączenie z bazą danych")
