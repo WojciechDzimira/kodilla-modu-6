@@ -71,7 +71,7 @@ class DataBaseSQL:
     def select_all(self, table_name):
         """Metoda zwraca wszystkie rekordy z podanej tabeli."""
         if table_name not in self.ALLOWED_TABLES:
-            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
             return []
 
         if self.conn:
@@ -86,7 +86,11 @@ class DataBaseSQL:
     def select(self, select_item, table_name):
         """Metoda zwraca coś z podanej tabeli"""
         if table_name not in self.ALLOWED_TABLES:
-            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            return []
+            valid_columns = self.get_table_columns(table_name)
+        if select_item not in valid_columns:
+            logging.error(f"Nieprawidłowa kolumna: {select_item}")
             return []
         if self.conn:
             try:
@@ -100,10 +104,10 @@ class DataBaseSQL:
     def update(self, table_name, column_name, new_value, row_id):
         """Metoda zmienia wartość w określonym miejscu bazy danych"""
         if table_name not in self.ALLOWED_TABLES:
-            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
             return []
         
-        valid_columns = self._get_table_columns(table_name)
+        valid_columns = self.get_table_columns(table_name)
         if column_name not in valid_columns:
             logging.error(f"Nieprawidłowa kolumna: {column_name}")
             return []

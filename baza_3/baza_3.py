@@ -9,32 +9,6 @@ from src.SQL_engine import DataBaseSQL
 logging.basicConfig(level=logging.DEBUG)
 
 
-   
-
-def data_base_creation(base):
-    
-    base.execute_script("sql_create.sql")
-
-
-def populate(base):
-  
-    while  True:
-        genre_list = ["dramaty", "komedia", "tragedia", "fantasy", "horror", "przygodowy", "Sci-fi", "akcja"]
-        x = int_input("Wczytać istniejącą listę: wpisz 1, utworzyc nową losową listę: wpisz 2 ")
-        if x == 1:
-            print("jeszcze mnie tu nie ma, ale bede ")
-
-        if x == 2:
-            print("UZUPEŁNIANIE BIBLIOTEKI LOSOWYMI FILMAMI/SERIALAMI")
-            number_of_films = int_input("Podaj ile losowych filmów chcesz mieć w bibliotece? Wpisz liczbę całkowitą lub 0: ")
-            number_of_serials = int_input("Podaj ile losowych seriali ma znaleźć się w bibliotece: kazdy bedzie miał 3 sezony po 15 odcinków. Wpisz liczbę całkowitą lub 0: ")
-            
-            
-
-
-
-
-
 def media_maker(base, media, media_number):
     genre_list = [
     "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", 
@@ -72,10 +46,10 @@ def media_maker(base, media, media_number):
 
 if __name__ == '__main__':
     while True:
-        
+        base = DataBaseSQL("database.db")
         if choice("Pierwsze uruchomienie? Jeśli chcesz utworzyć losową bazę danych wciśnij: (T) "):
             
-            base = DataBaseSQL("database.db")
+            
             base.execute_script("sql_create.sql")
             logging.debug("Utworzono baze danych")
 
@@ -95,8 +69,8 @@ if __name__ == '__main__':
             print("Nie udało się połączyć z bazą. Koniec programu.")
             exit(1)
         # Zamknięcie połączenia
-        base.close()
-        logging.debug("Zamknięto połączenie z bazą danych")
-
+        
         if not choice("Ponownie? (T/n): "):
             break
+        base.close()
+        logging.debug("Zamknięto połączenie z bazą danych")
