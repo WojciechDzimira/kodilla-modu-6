@@ -7,16 +7,12 @@ from SQL_engine import DataBaseSQL
 logging.basicConfig(level=logging.DEBUG)
 
 
-  
-
-
-
 def import_from_csv(base, table_name, file_path):
     ALLOWED_TABLES = {"Stations", "Measurements"}
     ALLOWED_COLUMNS = {"station", "date", "precip", "tobs" ,"latitude", "longitude", "elevation", "name", "country", "state"}
 
     if table_name not in ALLOWED_TABLES:
-            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name} w pliku {file_path}")
             return []
 
     with open(file_path, mode='r', encoding='utf-8') as f:
@@ -24,8 +20,8 @@ def import_from_csv(base, table_name, file_path):
         reader = csv.DictReader(f)
         columns = reader.fieldnames
 
-        if set(columns) != ALLOWED_COLUMNS:
-            logging.error(f"Niebezpieczna lub błędna nazwa kolumny! w pliku csv {file_path} wykryto komune niezgodną ze wzorem")
+        if not set(columns).issubset(ALLOWED_COLUMNS):
+            logging.error(f"Niebezpieczna lub błędna nazwa kolumny w pliku csv {file_path}")
             return []   
         
         placeholders = ", ".join(["?"] * len(columns))
@@ -41,9 +37,9 @@ def import_from_csv(base, table_name, file_path):
                 logging.error(f"Błąd danych w wierszu {row_counter}")
                 
                 
-            base.conn.commit()
-            logging.debug("Wykonano import danych z pliku csv do bazy danych i zatwierdzono zmiany")
-            logging.debug(f"Udało się importować {success_counter}/{row_counter} wierszy z pliku {file_path}")
+        base.conn.commit()
+        logging.debug("Wykonano import danych z pliku csv do bazy danych i zatwierdzono zmiany")
+        logging.debug(f"Udało się importować {success_counter}/{row_counter} wierszy z pliku {file_path}")
 
 def data_base_creation(base):
     
@@ -77,37 +73,3 @@ def top_temp_in_stations(base):
 
     print("\n" + "="*70)
 
-def choice(text):
-    if input(f"{text}") == "t":
-        return True
-    return False
-
-
-if __name__ == '__main__':
-    db_file = "database.db"
-    file_path = Path(db_file)
-    db_exist = file_path.exists()
-
-    base = DataBaseSQL("database.db") 
-    while True:
-        if base.conn is None:
-            print("Nie udało się połączyć z bazą. Koniec programu.")
-            logging.error("Błąd połaczenia z bazą danych")
-            exit(1)
-
-        if db_exist:
-            if not choice(f"Plik bazy danych: {db_file} już istnieje. Czy na pewno chcesz kontynuować i ewentualnie nadpisać dane? (t/n): "):
-                print("Anulowano import danych")
-            else:
-                data_base_creation(base)
-        else:
-            data_base_creation(base)
-
-        if choice("chcesz Wyświetlić top 3 temperatury ze wszystkich stacji? Wpisz (t) "):
-            top_temp_in_stations(base)
-
-
-        if not choice("Ponownie? (T/n): "):
-            break
-    base.close()
-    logging.debug("Zamknięto połączenie z bazą danych")
