@@ -73,3 +73,7 @@ def top_temp_in_stations(base):
 
     print("\n" + "="*70)
 
+def choice(text):
+    if input(f"{text}") == "t":
+        return True
+    return False
