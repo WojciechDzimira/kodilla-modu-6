@@ -88,10 +88,12 @@ class DataBaseSQL:
         if table_name not in self.ALLOWED_TABLES:
             logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
             return []
-            valid_columns = self.get_table_columns(table_name)
+        valid_columns = self.get_table_columns(table_name)
+        
         if select_item not in valid_columns:
             logging.error(f"Nieprawidłowa kolumna: {select_item}")
             return []
+        
         if self.conn:
             try:
                 cur = self.conn.cursor()
