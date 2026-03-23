@@ -34,18 +34,20 @@ class DataBaseSQL:
 
     def execute_script(self, sql_script_file):
         """Metoda pozwala wykonać skrypt zapisany w pliku"""
-        with open(sql_script_file, "r", encoding="utf-8") as f:
-            sql_script = f.read()
-        if self.conn:
-            try:
+        try:
+            with open(sql_script_file, "r", encoding="utf-8") as f:
+                sql_script = f.read()
+
+            if self.conn:
                 cur = self.conn.cursor()
                 cur.executescript(sql_script)
                 self.conn.commit()
                 logging.debug("Wykonano skrypt SQL.")
                 return True
-            except Error as e:
-                logging.error(f"Błąd wykonania skryptu: {e}")
-                return False
+            
+        except (Error, FileNotFoundError) as e:
+            logging.error(f"Błąd wykonania skryptu: {e}")
+            return False
 
     def execute_sql(self, sql, params=()):
         """Metoda wykonuje polecenie sql z paramterami."""
