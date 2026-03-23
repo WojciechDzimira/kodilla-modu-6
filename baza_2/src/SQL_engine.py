@@ -42,8 +42,10 @@ class DataBaseSQL:
                 cur.executescript(sql_script)
                 self.conn.commit()
                 logging.debug("Wykonano skrypt SQL.")
+                return True
             except Error as e:
                 logging.error(f"Błąd wykonania skryptu: {e}")
+                return False
 
     def execute_sql(self, sql, params=()):
         """Metoda wykonuje polecenie sql z paramterami."""
@@ -144,3 +146,4 @@ class DataBaseSQL:
         """metoda zamyka połaczenie z bazą danych"""
         if self.conn:
             self.conn.close()
+            self.conn = None
