@@ -49,7 +49,7 @@ def test_create_connection_error():
 
 def test_close_db_connection(base):
     base.close()
-    assert base.conn is  None
+    assert base.conn is None
 
 
 
@@ -84,15 +84,15 @@ def test_execute_script_no_file(base):
     result = base.execute_script("no_script_file")
     assert result == False
 
-def test_execute_script(base, sql_script_test_file):
+def test_execute_script_exist(base, sql_script_test_file):
     result = base.execute_script(sql_script_test_file)
     assert result == True
 
 def test_execute_script(base, sql_script_test_file):
     base.ALLOWED_TABLES.add("TestTable") 
     base.execute_script(sql_script_test_file)
-    resoult = base.select_all("TestTable")
-    assert len(resoult) > 0, "Baza nie ma rekordów! Sprawdź INSERT w skrypcie."
+    result = base.select_all("TestTable")
+    assert len(result) > 0, "Baza nie ma rekordów! Sprawdź INSERT w skrypcie."
 
 def test_execute_script_utf_8(base, sql_script_test_file):
     base.ALLOWED_TABLES.add("TestTable") 

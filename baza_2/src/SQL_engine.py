@@ -49,7 +49,7 @@ class DataBaseSQL:
             return False
 
     def execute_sql(self, sql, params=()):
-        """Metoda wykonuje polecenie sql z paramterami."""
+        """Metoda wykonuje polecenie sql z paramerami."""
         if self.conn:
             try:
                 cur = self.conn.cursor()
@@ -61,7 +61,7 @@ class DataBaseSQL:
                 logging.error(f"Błąd wykonania SQL: {e}")
     
     def execute_sql_without_commit(self, sql, params=()):
-        """Metoda wykonuje polecenie sql z paramterami."""
+        """Metoda wykonuje polecenie sql z parametrami."""
         if self.conn:
             try:
                 cur = self.conn.cursor()
@@ -130,14 +130,14 @@ class DataBaseSQL:
     def delete(self, table_name, row_id):
         """metoda usuwa określony element bazy danych"""
         if table_name not in self.ALLOWED_TABLES:
-            logging.error("Niebezpieczna lub błędna nazwa tabeli: {table_name}")
+            logging.error(f"Niebezpieczna lub błędna nazwa tabeli: {table_name}")
             return []
         if self.conn:
             try:
                 cur = self.conn.cursor()
                 sql = f"DELETE FROM {table_name} WHERE id = ?"
                 cur.execute(sql, (row_id,)) 
-                logging.debug(f"usunięto: wiersz {row_id,} w tabeli {table_name}")
+                logging.debug(f"usunięto: wiersz {row_id} w tabeli {table_name}")
                 self.conn.commit()
                 
             except Error as e:

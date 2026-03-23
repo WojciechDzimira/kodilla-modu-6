@@ -24,7 +24,7 @@ if __name__ == '__main__':
     while True:
         if base.conn is None:
             print("Nie udało się połączyć z bazą. Koniec programu.")
-            logging.error("Błąd połaczenia z bazą danych")
+            logging.error("Błąd połączenia z bazą danych")
             exit(1)
 
         if db_exist:
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         else:
             data_base_creation(base)
 
-        if choice("chcesz Wyświetlić top 3 temperatury ze wszystkich stacji? Wpisz (t) "):
+        if choice("Czy chcesz wyświetlić top 3 temperatury ze wszystkich stacji? Wpisz (t) "):
             top_temp_in_stations(base)
 
 
