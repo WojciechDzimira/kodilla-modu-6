@@ -3,8 +3,8 @@ from sqlite3 import Error
 import logging
 import csv 
 from pathlib import Path
-from SQL_engine import DataBaseSQL
-from data_manager import *
+from src.SQL_engine import DataBaseSQL
+from utils.data_manager import *
 logging.basicConfig(level=logging.DEBUG)
 
 
