@@ -1,8 +1,7 @@
 import logging
 import sqlite3
 from sqlite3 import Error
-from faker import Faker
-fake = Faker('pl_PL')
+
 logging.basicConfig(level=logging.DEBUG)
 
 

@@ -1,0 +1,26 @@
+# Weather Data SQL Manager
+
+A Python-based tool for managing weather station data and measurements using SQLite. 
+
+## Features
+- **OOP Approach**: Database logic encapsulated in the `DataBaseSQL` class.
+- **Security**: SQL Injection protection via parameter binding and table/column whitelisting.
+- **Data Import**: Efficient CSV to SQLite migration with transaction management.
+- **Testing**: Unit tests implemented with `pytest` using an in-memory database (`:memory:`).
+
+## Project Structure
+- `src/SQL_engine.py` – Database abstraction layer.
+- `utils/data_manager.py` – CSV processing and reporting logic.
+- `main.py` – Application entry point.
+- `tests/` – Unit tests.
+
+## How to run
+1. Install dependencies:
+   ```bash
+   pip install pytest
+2. Run the application:
+    ```bash
+    python main.py
+3. Run tests:
+    ```bash
+    pytest
