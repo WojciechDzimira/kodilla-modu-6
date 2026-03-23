@@ -33,7 +33,8 @@ def sql_script_test_file(tmp_path):
     path = tmp_path / "test_folder" 
     path.mkdir()
     test_file_path = path / "SQL_test_script.sql"
-    content = "CREATE TABLE TestTable (name TEXT); INSERT INTO TestTable VALUES ('Łódź');"
+    content = "CREATE TABLE TestTable (name TEXT); " \
+    "INSERT INTO TestTable VALUES ('źdźbło');"
     test_file_path.write_text(content, encoding="utf-8")
     return str(test_file_path) 
 
@@ -76,6 +77,9 @@ def test_get_table_columns_returning_columns_names(base_with_data):
     assert "precip" in result
     assert "tobs" in result
 
+
+
+
 def test_execute_script_no_file(base):
     result = base.execute_script("no_script_file")
     assert result == False
@@ -83,6 +87,25 @@ def test_execute_script_no_file(base):
 def test_execute_script(base, sql_script_test_file):
     result = base.execute_script(sql_script_test_file)
     assert result == True
+
+def test_execute_script(base, sql_script_test_file):
+    base.ALLOWED_TABLES.add("TestTable") 
+    base.execute_script(sql_script_test_file)
+    resoult = base.select_all("TestTable")
+    assert len(resoult) > 0, "Baza nie ma rekordów! Sprawdź INSERT w skrypcie."
+
+def test_execute_script_utf_8(base, sql_script_test_file):
+    base.ALLOWED_TABLES.add("TestTable") 
+    base.execute_script(sql_script_test_file)
+    result = base.select_all("TestTable")
+    assert result[0][0] == "źdźbło"
+
+
+
+
+
+
+
 
 
 def test_select_all_table_name(base):
